@@ -33,8 +33,3 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
-
-# Project specific
-*.pkl
-*.h5
-*.model
