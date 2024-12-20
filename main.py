@@ -4,18 +4,22 @@ import pandas as pd
 import pickle
 import ast
 from difflib import get_close_matches
+import os
+from pathlib import Path
 
+# Update your file paths to use os.path
+BASE_DIR = Path(__file__).resolve().parent
 
-# load dataabse=======
-sym_des = pd.read_csv('datasets/symptoms_df.csv')
-precautions = pd.read_csv('datasets/precautions_df.csv')
-workout = pd.read_csv('datasets/workout_df.csv')
-description = pd.read_csv('datasets/description.csv')
-medications = pd.read_csv('datasets/medications.csv')
-diets = pd.read_csv('datasets/diets.csv')
+# Update your data loading code
+sym_des = pd.read_csv(os.path.join(BASE_DIR, 'datasets/symptoms_df.csv'))
+precautions = pd.read_csv(os.path.join(BASE_DIR, 'datasets/precautions_df.csv'))
+workout = pd.read_csv(os.path.join(BASE_DIR, 'datasets/workout_df.csv'))
+description = pd.read_csv(os.path.join(BASE_DIR, 'datasets/description.csv'))
+medications = pd.read_csv(os.path.join(BASE_DIR, 'datasets/medications.csv'))
+diets = pd.read_csv(os.path.join(BASE_DIR, 'datasets/diets.csv'))
 
-#load model===========
-svc = pickle.load(open("models/svc.pkl", 'rb'))
+# Update model loading
+svc = pickle.load(open(os.path.join(BASE_DIR, "models/svc.pkl"), 'rb'))
 
 app = Flask(__name__)
 # helper function
@@ -124,4 +128,5 @@ def developer():
 
 # python main
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
