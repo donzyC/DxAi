@@ -190,24 +190,28 @@ nav.navbar {
   }
   
   .input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  position: relative;
-  color: white;
-  flex-grow: 1;
-  margin-right: 1rem;
-  }
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    position: relative;
+    color: white;
+    flex-grow: 1;
+    margin-right: 1rem;
+}
 
   .input-container .label {
-      font-size: 15px;
-      padding-left: 10px;
-      position: absolute;
-      top: 13px;
-      transition: 0.3s;
-      pointer-events: none;
-      color: gray;
-  }
+    font-size: 15px;
+    padding-left: 10px;
+    position: absolute;
+    top: 13px;
+    transition: 0.3s;
+    pointer-events: none;
+    color: gray;
+    white-space: nowrap;
+    max-width: 90%; /* Limit width when not focused */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
   .input {
       width: 100%;
@@ -234,12 +238,15 @@ nav.navbar {
 
   .input-container .input:valid ~ .label,
   .input-container .input:focus ~ .label {
-      transition: 0.3s;
-      padding-left: 2px;
-      transform: translateY(-35px);
-      font-size: 14px;
-      color: gray;
-  }
+    transition: 0.3s;
+    padding-left: 2px;
+    transform: translateY(-35px);
+    font-size: 14px;
+    color: gray;
+    max-width: none; /* Remove width limitation */
+    overflow: visible;
+    text-overflow: clip;
+}
   input, textarea {
     font-size: 16px !important; /* Prevents iOS zoom on focus */
 }
@@ -425,7 +432,11 @@ nav.navbar {
 
       .input-container .label {
           font-size: 13px;
-          top: 11px;
+      }
+
+      .input-container .input:valid ~ .label,
+      .input-container .input:focus ~ .label {
+          font-size: 12px;
       }
 
       .btn {
