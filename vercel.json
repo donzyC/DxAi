@@ -1,20 +1,19 @@
 {
     "version": 2,
-    "functions": {
-        "api/*.py": {
-            "runtime": "@vercel/python@3.1.30",
-            "memory": 3008
+    "builds": [
+        {
+            "src": "api/index.py",
+            "use": "@vercel/python",
+            "config": {
+                "runtime": "python3.9",
+                "maxLambdaSize": "15mb"
+            }
         }
-    },
+    ],
     "routes": [
         {
             "src": "/(.*)",
-            "dest": "/api/index.py"
+            "dest": "api/index.py"
         }
-    ],
-    "build": {
-        "env": {
-            "PIP_NO_BINARY": ""
-        }
-    }
+    ]
 }
