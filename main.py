@@ -6,7 +6,6 @@ import ast
 from difflib import get_close_matches
 import os
 from pathlib import Path
-from flask_cors import CORS
 
 # Update your file paths to use os.path
 BASE_DIR = Path(__file__).resolve().parent
@@ -20,16 +19,9 @@ medications = pd.read_csv(os.path.join(BASE_DIR, 'datasets/medications.csv'))
 diets = pd.read_csv(os.path.join(BASE_DIR, 'datasets/diets.csv'))
 
 # Update model loading
-try:
-    with open(os.path.join(BASE_DIR, "models/svc.pkl"), 'rb') as f:
-        svc = pickle.load(f)
-except Exception as e:
-    print(f"Error loading model: {e}")
-    svc = None
+svc = pickle.load(open(os.path.join(BASE_DIR, "models/svc.pkl"), 'rb'))
 
 app = Flask(__name__)
-CORS(app)
-
 # helper function
 def helper(dis):
     desc = description[description['Disease'] == dis]['Description']
@@ -135,5 +127,6 @@ def developer():
     return render_template('developer.html')
 
 # python main
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
