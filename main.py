@@ -4,7 +4,6 @@ import pandas as pd
 import pickle
 import ast
 from difflib import get_close_matches
-import os
 
 # Load the datasets
 sym_des = pd.read_csv('datasets/symptoms_df.csv')
@@ -15,16 +14,7 @@ medications = pd.read_csv('datasets/medications.csv')
 diets = pd.read_csv('datasets/diets.csv')
 
 # Load model
-try:
-    model_path = os.path.join('models', 'svc.pkl')
-    if not os.path.exists(model_path):
-        raise FileNotFoundError(f"Model file not found at {model_path}")
-        
-    with open(model_path, 'rb') as f:
-        svc = pickle.load(f)
-except Exception as e:
-    print(f"Error loading model: {str(e)}")
-    raise
+svc = pickle.load(open("models/svc.pkl", 'rb'))
 
 app = Flask(__name__)
 
@@ -129,4 +119,4 @@ def developer():
     return render_template('developer.html')
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
