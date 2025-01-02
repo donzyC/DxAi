@@ -4,24 +4,20 @@ import pandas as pd
 import pickle
 import ast
 from difflib import get_close_matches
-import os
-from pathlib import Path
 
-# Update your file paths to use os.path
-BASE_DIR = Path(__file__).resolve().parent
+# Load the datasets
+sym_des = pd.read_csv('datasets/symptoms_df.csv')
+precautions = pd.read_csv('datasets/precautions_df.csv')
+workout = pd.read_csv('datasets/workout_df.csv')
+description = pd.read_csv('datasets/description.csv')
+medications = pd.read_csv('datasets/medications.csv')
+diets = pd.read_csv('datasets/diets.csv')
 
-# Update your data loading code
-sym_des = pd.read_csv(os.path.join(BASE_DIR, 'datasets/symptoms_df.csv'))
-precautions = pd.read_csv(os.path.join(BASE_DIR, 'datasets/precautions_df.csv'))
-workout = pd.read_csv(os.path.join(BASE_DIR, 'datasets/workout_df.csv'))
-description = pd.read_csv(os.path.join(BASE_DIR, 'datasets/description.csv'))
-medications = pd.read_csv(os.path.join(BASE_DIR, 'datasets/medications.csv'))
-diets = pd.read_csv(os.path.join(BASE_DIR, 'datasets/diets.csv'))
-
-# Update model loading
-svc = pickle.load(open(os.path.join(BASE_DIR, "models/svc.pkl"), 'rb'))
+# Load model
+svc = pickle.load(open("models/svc.pkl", 'rb'))
 
 app = Flask(__name__)
+
 # helper function
 def helper(dis):
     desc = description[description['Disease'] == dis]['Description']
@@ -32,13 +28,13 @@ def helper(dis):
     
     med = medications[medications['Disease'] == dis]['Medication']
     if not med.empty:
-        med = ast.literal_eval(med.iloc[0])  # Convert the string to a list
+        med = ast.literal_eval(med.iloc[0])
     else:
-        med = [] 
+        med = []
 
     die = diets[diets['Disease'] == dis]['Diet']
     if not die.empty:
-        die = ast.literal_eval(die.iloc[0])  # Convert the string to a list
+        die = ast.literal_eval(die.iloc[0])
     else:
         die = []
 
@@ -56,8 +52,7 @@ def get_predicted_value(patient_symptoms):
         input_vector[symptoms_dict[item]] = 1
     return diseases_list[svc.predict([input_vector])[0]]
 
-
-# creating routes=======
+# creating routes
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -66,16 +61,15 @@ def index():
 def predict():
     if request.method == 'POST':
         symptoms = request.form.get('symptoms')
-
-        # Parse and clean the user input - convert to lowercase first
+        
+        # Parse and clean user input
         user_symptoms = [s.strip().lower().replace(' ', '_') for s in symptoms.split(',')]
-        user_symptoms = [sym.strip("[]' ") for sym in user_symptoms]  
-              
-        # Validate symptoms - compare with lowercase versions of valid symptoms
+        user_symptoms = [sym.strip("[]' ") for sym in user_symptoms]
+        
+        # Validate symptoms
         symptoms_dict_lower = {k.lower(): v for k, v in symptoms_dict.items()}
         invalid_symptoms = [sym for sym in user_symptoms if sym not in symptoms_dict_lower]
         
-        # For suggestions, use lowercase comparison
         valid_symptoms_lower = [s.lower() for s in symptoms_dict.keys()]
         suggestions = {sym: get_close_matches(sym, valid_symptoms_lower, n=3) for sym in invalid_symptoms}
 
@@ -89,14 +83,12 @@ def predict():
             return render_template('index.html', error=error_message, symptoms=symptoms)
 
         try:
-            # Convert back to original symptom keys for prediction
             original_symptoms = [next(k for k in symptoms_dict.keys() if k.lower() == sym) for sym in user_symptoms]
-            # Predict disease
             predicted_disease = get_predicted_value(original_symptoms)
             desc, pre, med, die, wrkout = helper(predicted_disease)
-
+            
             my_pre = [i for i in pre[0]]
-
+            
             return render_template(
                 'index.html',
                 predicted_disease=predicted_disease,
@@ -126,7 +118,5 @@ def blog():
 def developer():
     return render_template('developer.html')
 
-# python main
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
