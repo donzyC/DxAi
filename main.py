@@ -1,18 +1,12 @@
 from flask import Flask, request, render_template
-from flask_cors import CORS
 import numpy as np
 import pandas as pd
 import pickle
 import ast
 from difflib import get_close_matches
-from sklearn.svm import SVC  # Add this import
 
-app = Flask(__name__)
-CORS(app)
 
-# Load datasets
-training = pd.read_csv('datasets/Training.csv')
-symptom_severity = pd.read_csv('datasets/Symptom-severity.csv')
+# Load the datasets
 sym_des = pd.read_csv('datasets/symptoms_df.csv')
 precautions = pd.read_csv('datasets/precautions_df.csv')
 workout = pd.read_csv('datasets/workout_df.csv')
@@ -20,13 +14,10 @@ description = pd.read_csv('datasets/description.csv')
 medications = pd.read_csv('datasets/medications.csv')
 diets = pd.read_csv('datasets/diets.csv')
 
+# Load model
+svc = pickle.load(open("models/svc.pkl", 'rb'))
 
-# Create and train model instead of loading from pickle
-X = training.iloc[:, :-1]  # Features
-y = training.iloc[:, -1]   # Target
-svc = SVC()
-svc.fit(X, y)
-
+app = Flask(__name__)
 
 # helper function
 def helper(dis):
